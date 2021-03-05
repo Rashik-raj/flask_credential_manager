@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block style %}
+<style>
+    .pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+    }
+    .pagination-page-info b {
+        color: black;
+        background: #6aa6ed;
+        padding-left: 2px;
+        padding: .1em .25em;
+        font-size: 150%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col col-sm-6 mt-4">
+        <!-- Button Trigger Add Credential Modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCredentialModal">
+            Add Credential
+        </button>
+        <hr />
+        {{ pagination.info }}
+        {{ pagination.links }}
+        <table class="table table-hover fancy-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">SN</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if credentials.count() > 0 %}
+                {% for credential in credentials %}
+                <tr>
+                    <th scope="row">{{ loop.index + pagination.skip }}</th>
+                    <td><span id="spanCredentialUrl{{ loop.index }}"><a href="{{ credential.url }}" target="_blank">{{
+                                credential.url }}</a></span></td>
+                    <td><span id="spanCredentialName{{ loop.index }}">{{ credential.name }}</td></span></td>
+                    <td><span id="spanCredentialUsername{{ loop.index }}">{{ credential.username }}</span></td>
+                    <td><input type="password" value="{{ credential.password }}" id="password{{ loop.index }}"
+                            readonly />
+                        <button class="btn btn-sm btn-primary" id="eyeBtn{{ loop.index }}"
+                            onclick="dispPassword('{{ loop.index }}')"><i class="bi bi-eye"
+                                id="eye{{ loop.index }}"></i></button>
+                        <button class="btn btn-sm btn-muted" onclick="copyPassword('{{ loop.index }}')"><i
+                                class="bi bi-clipboard"></i> Copy to Clipboard</button>
+                        <!-- Button Trigger Add Credential Modal -->
+                        <button type="button" class="btn btn-sm btn-success" data-toggle="modal"
+                            data-target="#editCredentialModal" data-id="{{ credential.id }}"
+                            data-index="{{ loop.index }}">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <a class="btn btn-sm btn-danger" href="{{ url_for('credential.delete', id=credential.id) }}"><i
+                                class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <th scope="row" colspan="5">
+                        <h1 class="text-warning text-center">Please add Credential!
+                    </th>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {{ pagination.links }}
+    </div>
+</div>
+
+<!-- Add Credential Modal -->
+<div class="modal fade" id="addCredentialModal" tabindex="-1" role="dialog" aria-labelledby="addCredentialModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCredentialModalLabel">Add Credential</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ url_for('credential.add') }}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="url">URL</label>
+                        <input type="text" class="form-control" id="url" placeholder="URL" name="url">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Username" name="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password"
+                            name="password">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Edit Credential Modal -->
+<div class="modal fade" id="editCredentialModal" tabindex="-1" role="dialog" aria-labelledby="editCredentialModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCredentialModalLabel">Edit Credential</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ url_for('credential.edit') }}">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editCredentialId">Credential Id</label>
+                        <input type="text" class="form-control" id="editCredentialId" placeholder="Credential Id" name="editCredentialId">
+                    </div>
+                    <div class="form-group">
+                        <label for="editUrl">URL</label>
+                        <input type="text" class="form-control" id="editUrl" placeholder="URL" name="editUrl">
+                    </div>
+                    <div class="form-group">
+                        <label for="editName">Name</label>
+                        <input type="text" class="form-control" id="editName" placeholder="Name" name="editName">
+                    </div>
+                    <div class="form-group">
+                        <label for="editUsername">Username</label>
+                        <input type="text" class="form-control" id="editUsername" placeholder="Username"
+                            name="editUsername">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password</label>
+                        <input type="password" class="form-control" id="editPassword" placeholder="Password"
+                            name="editPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPin">PIN</label>
+                        <input type="text" class="form-control" id="editPin" placeholder="4 digit PIN"
+                            name="editPin">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Edit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script src="{{ url_for('static', filename='js/fancyTable.js') }}"></script>
+<script src="{{ url_for('static', filename='js/basic.js') }}"></script>
+{% endblock %}

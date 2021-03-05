@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Change Password{% endblock %}
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-sm-4 mt-4">
+        <h1 class="text-center">Change Password</h1>
+        <form method="POST" action="{{ url_for('auth.pin') }}" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col col-sm-3">
+                    <img src="{{ url_for('static', filename=user.image) }}" class="img-thumbnail"/>
+                </div>
+                <div class="col col-sm-9">
+                    <div class="form-group">
+                        <label for="newPin">New Pin</label>
+                        <input type="text" class="form-control" id="newPin" placeholder="New PIN" name="newPin">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPin">Confirm Pin</label>
+                        <input type="text" class="form-control" id="confirmPin" placeholder="Confirm Pin" name="confirmPin">
+                    </div>
+                    <div class="form-group">
+                        <label for="oldPin">Old Pin</label>
+                        <input type="text" class="form-control" id="oldPin" placeholder="Old Pin" name="oldPin">
+                    </div>
+                    <button type="submit" class="btn btn-success">Change Pin</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
